@@ -1,22 +1,22 @@
 CCC = gcc
-CCFLAGS = -g -Wall -Iinclude
+CCFLAGS = -Iinclude
 
 SOURCE = $(wildcard src/*.c)
 INCLUDE = $(wildcard ./include/*.h)
-OBJECTS = $(SOURCE:./src/%.c=./bin/%.o) bin/trab2.o
+OBJECTS = $(SOURCE:.c=.o) trab2.o
 
 TARGET = trab2
 
 all: $(TARGET)
 
-$(TARGET): $(OBJECTS) 
-	$(CCC) $(CCFLAGS) -o $@ $^ 
+$(TARGET): $(OBJECTS)
+	$(CCC) $(CCFLAGS) -o $@ $^
 
-bin/%.o: ./src/%.c $(INCLUDE) | bin
+%.o: %.c $(INCLUDE)
 	$(CCC) $(CCFLAGS) -c -o $@ $<
 
-bin/trab2.o: trab2.c $(INCLUDE) | bin
+trab2.o: trab2.c $(INCLUDE)
 	$(CCC) $(CCFLAGS) -c -o $@ $< 
 
 clean:
-	rm -f bin/*.o $(TARGET)
+	rm -f src/*.o trab2.o $(TARGET)

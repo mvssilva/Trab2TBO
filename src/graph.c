@@ -8,7 +8,7 @@ struct Graph{
     char *typeNode;
 
     int sizeV;
-    int sizeE;
+
     int sizeC;
     int sizeS;
     int sizeM;   
@@ -29,7 +29,8 @@ Graph *graph_construct(int v, int e, int s, int c, int m)
 {
     Graph * g = (Graph*) malloc(sizeof(Graph));
     g->sizeV = v;
-    g->sizeE = e;
+
+    //Quantidade de vértices diferentes
     g->sizeS = s;
     g->sizeC = c;
     g->sizeM = m;
@@ -51,6 +52,13 @@ Graph *graph_construct(int v, int e, int s, int c, int m)
     return g;
 }
 
+/**
+ * Função que lê os dados de um arquivo e constrói uma estrutura de grafo (`Graph`) a partir deles.
+ * O arquivo de entrada deve conter as especificações do grafo, incluindo vértices, arestas, seus tipos e seus custos.
+ * 
+ * @param directory Caminho do arquivo de entrada que contém a definição do grafo.
+ * @return Ponteiro para a estrutura `Graph`, criada a partir dos dados lidos do arquivo.
+ */
 Graph *read_file(char * directory)
 {
     FILE *file = fopen(directory, "r");
@@ -71,18 +79,14 @@ Graph *read_file(char * directory)
 
     for(int i = 0; i < tam ; i ++){
         len = getline(&line, &size, file);
-        if(i < s){
-            int vertex = atoi(line);
-            G->typeNode[vertex] =  's';
-        }
-        else if(i < s + c){
-            int vertex = atoi(line);
-            G->typeNode[vertex] =  'c';
-        }
-        else{
-            int vertex = atoi(line);
-            G->typeNode[vertex] =  'm';
-        }
+        int src = atoi(line);
+
+        if(i < s)
+            G->typeNode[src] =  's';
+        else if(i < s + c)
+            G->typeNode[src] =  'c';
+        else
+            G->typeNode[src] =  'm';
     }
     
     while ((len = getline(&line, &size, file)) != -1)
@@ -134,7 +138,7 @@ void graph_add_node(AdjList *src, int dest, double weight)
     }
 }
 
-int graph_get_qtd_M(Graph* g){
+int graph_get_size_M(Graph* g){
    return g->sizeM;
 }
 
@@ -146,16 +150,136 @@ int graph_get_type_v(Graph *g, int idx)
     return 1;
 }
 
-int graph_get_qtd_S(Graph* g){
+int graph_get_size_adj(Graph *g, int x)
+{
+    return g->array[x].sizeList;
+}
+
+char graph_get_type_vertex(Graph * g, int idx)
+{
+    return g->typeNode[idx];
+}
+
+int graph_get_idx_adj(Graph * g, int idx, int cont)
+{
+    Node * n = g->array[idx].head;
+
+    for(int i = 0; i < cont; i++){
+        n = n->next;
+    }
+
+    if(n == NULL)
+        exit(printf("Error : funcao de retorno dos indices dos adjacentes!\n"));
+
+    return n->dest;
+}
+
+int graph_get_idx_s_in_cost(Graph * g, int position)
+{
+    int size = graph_get_size_V(g);
+    int cont  = 0;
+    int x = 0;
+    for(int i = 0; i < size; i++){
+        if(g->typeNode[i] == '\n')
+            continue;
+
+        if(g->typeNode[i] == 's')
+            cont++;
+        
+        if(cont - 1 == position){
+            return x;
+        }
+        x++;
+    }
+
+    return -1;
+}
+
+int graph_get_idx_m_in_cost(Graph * g, int position)
+{
+    int size = graph_get_size_V(g);
+    int cont  = 0;
+    int x = 0;
+    for(int i = 0; i < size; i++){
+        if(g->typeNode[i] == '\n')
+            continue;
+        if(g->typeNode[i] == 'm')
+            cont++;
+        
+        if(cont - 1 == position){
+            return x;
+        }
+        x++;
+    }
+
+    return -1;
+}
+
+int graph_get_idx_c_in_cost(Graph * g, int position)
+{
+    int size = graph_get_size_V(g);
+    int cont  = 0;
+    int x = 0;
+    for(int i = 0; i < size; i++){
+         if(g->typeNode[i] == '\n')
+            continue;
+        if(g->typeNode[i] == 'c')
+            cont++;
+        
+        if(cont - 1 == position){
+            return x;
+        }
+        x++;
+    }
+
+    return -1;
+}
+
+double graph_get_value_adj(Graph * g, int idx, int cont)
+{
+    Node * n = g->array[idx].head;
+
+    for(int i = 0; i < cont; i++){
+        n = n->next;
+    }
+
+    if(n == NULL)
+        exit(printf("Error : funcao de retorno dos values dos adjacentes!\n"));
+
+    return n->weight;
+}
+
+void graph_free_vector_v_import(int * a)
+{
+    free(a);
+}
+
+int graph_get_size_C_M_S(Graph* g){
+   return g->sizeS + g->sizeC + g->sizeM;
+}
+
+int graph_get_size_S(Graph* g){
    return g->sizeS;
 }
 
-int graph_get_qtd_C(Graph* g){
+int graph_get_size_C(Graph* g){
    return g->sizeC;
 }
 
-int graph_get_qtd_V(Graph* g){
+int graph_get_size_V(Graph* g){
    return g->sizeV;
+}
+
+int * graph_get_vector_v_import(Graph* g){
+    int * r = (int*)malloc(graph_get_size_C_M_S(g) * sizeof(int));
+    int idx = 0;
+    int size = g->sizeV;
+    for ( int i = 0; i < size; i++ ){
+        if(g->typeNode[i] == 'c' || g->typeNode[i] == 's' || g->typeNode[i] == 'm')
+            r[idx++] = i; 
+    }
+
+    return r;
 }
 
 void print_graph(Graph* g){

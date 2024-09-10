@@ -1,6 +1,19 @@
 {
     "files.associations": {
         "graph.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "heap.h": "c",
+        "functional": "c",
+        "array": "c",
+        "string_view": "c",
+        "initializer_list": "c",
+        "item.h": "c",
+        "stdio.h": "c",
+        "optional": "c",
+        "system_error": "c",
+        "tuple": "c",
+        "type_traits": "c",
+        "utility": "c",
+        "algorithm.h": "c"
     }
 }
